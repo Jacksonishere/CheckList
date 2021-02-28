@@ -47,7 +47,7 @@
                     <navigationItem key="navigationItem" title="Checklists" id="Lug-kl-UlZ">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="Whz-Eg-qjR">
                             <connections>
-                                <segue destination="4h2-vz-tq0" kind="show" id="lCv-MO-a7B"/>
+                                <segue destination="4h2-vz-tq0" kind="show" identifier="AddItem" id="lCv-MO-a7B"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -124,6 +124,9 @@
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="58l-IY-ucM">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
+                        <textAttributes key="titleTextAttributes">
+                            <color key="textColor" systemColor="labelColor"/>
+                        </textAttributes>
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
@@ -136,6 +139,9 @@
         </scene>
     </scenes>
     <resources>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

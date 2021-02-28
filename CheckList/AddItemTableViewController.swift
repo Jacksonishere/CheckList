@@ -7,7 +7,16 @@
 
 import UIKit
 
+//Usually, we define class className : inheritclassfrom
+protocol AddItemTableViewControllerDelegate: class {
+  func addItemViewControllerDidCancel(_ controller: AddItemTableViewController)
+  
+    func addItemViewController(_ controller: AddItemTableViewController,didFinishAdding item: ChecklistItem)
+}
+
 class AddItemTableViewController: UITableViewController, UITextFieldDelegate {
+    weak var delegate: AddItemTableViewControllerDelegate?
+
     @IBOutlet weak var doneBarButton: UIBarButtonItem!
     
     @IBOutlet weak var textField: UITextField!
@@ -25,7 +34,7 @@ class AddItemTableViewController: UITableViewController, UITextFieldDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
       super.viewWillAppear(animated)
-      textField.becomeFirstResponder()
+      textField.becomeFirstResponder() //so that the keyboard automatically comes up
     }
     
     // MARK: - Text Field Delegates
@@ -54,11 +63,14 @@ class AddItemTableViewController: UITableViewController, UITextFieldDelegate {
 
     // MARK: - Actions
     @IBAction func cancel() {
-      navigationController?.popViewController(animated: true)
+        delegate?.addItemViewControllerDidCancel(self)
     }
 
     @IBAction func done() {
-      navigationController?.popViewController(animated: true)
+        let item = ChecklistItem()
+        item.text = textField.text!
+
+        delegate?.addItemViewController(self, didFinishAdding: item)
     }
 }
 
