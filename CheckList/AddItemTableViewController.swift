@@ -7,15 +7,18 @@
 
 import UIKit
 
+// MARK: - PROTOCOL
 //Usually, we define class className : inheritclassfrom
 protocol AddItemTableViewControllerDelegate: class {
-  func addItemViewControllerDidCancel(_ controller: AddItemTableViewController)
-  
+    func addItemViewControllerDidCancel(_ controller: AddItemTableViewController)
     func addItemViewController(_ controller: AddItemTableViewController,didFinishAdding item: ChecklistItem)
+    func addItemViewController(_ controller: AddItemTableViewController, didFinishEditing item: ChecklistItem)
+
 }
 
 class AddItemTableViewController: UITableViewController, UITextFieldDelegate {
     weak var delegate: AddItemTableViewControllerDelegate?
+    var itemToEdit: ChecklistItem?
 
     @IBOutlet weak var doneBarButton: UIBarButtonItem!
     
@@ -24,6 +27,12 @@ class AddItemTableViewController: UITableViewController, UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        if let item = itemToEdit {
+            title = "Edit Item"
+            textField.text = item.text
+            doneBarButton.isEnabled = true    // initially set false
+        }
+        
         navigationItem.largeTitleDisplayMode = .never
     }
     
@@ -67,10 +76,15 @@ class AddItemTableViewController: UITableViewController, UITextFieldDelegate {
     }
 
     @IBAction func done() {
-        let item = ChecklistItem()
-        item.text = textField.text!
-
-        delegate?.addItemViewController(self, didFinishAdding: item)
+        if let item = itemToEdit {
+            item.text = textField.text!
+            delegate?.addItemViewController(self, didFinishEditing: item)
+        }
+        else {
+            let item = ChecklistItem()
+            item.text = textField.text!
+            delegate?.addItemViewController(self, didFinishAdding: item)
+        }
     }
 }
 
