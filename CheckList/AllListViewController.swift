@@ -68,6 +68,7 @@ class AllListViewController: UITableViewController, ListDetailViewControllerDele
             item.text = "Item for \(list.name)"
             list.items.append(item)
         }
+        
         loadChecklists()
     }
     
