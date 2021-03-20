@@ -11,12 +11,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-
+    let dataModel = DataModel()
+    
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-        // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-        // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-        guard let _ = (scene as? UIWindowScene) else { return }
+        
+        let navigationController = window!.rootViewController as! UINavigationController
+        let controller = navigationController.viewControllers[0] as! AllListViewController
+        controller.dataModel = dataModel
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -53,9 +54,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func saveData() {
         //fore unwrapping. we asking window which contains full ui hierarchy for app
         print("saving")
-        let navigationController = window!.rootViewController as! UINavigationController
-        let controller = navigationController.viewControllers[0] as! AllListViewController
-        controller.saveChecklists()
+        dataModel.saveChecklists()
     }
 }
 
