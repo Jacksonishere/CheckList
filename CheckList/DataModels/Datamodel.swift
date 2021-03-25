@@ -41,12 +41,15 @@ class DataModel {
 
     // this method is now called loadChecklists()
     func loadChecklists() {
+        print("loading checklist")
         let path = dataFilePath()
         if let data = try? Data(contentsOf: path) {
             let decoder = PropertyListDecoder()
             do {
                 // You decode to an object of [Checklist] type to lists
                 lists = try decoder.decode([Checklist].self, from: data)
+                sortChecklists()
+                print(lists, "the decoded list")
             }
             catch {
                 print("Error decoding list array: \(error.localizedDescription)")
@@ -55,7 +58,10 @@ class DataModel {
     }
     
     func registerDefaults() {
-        let dictionary = [ "ChecklistIndex": -1 ]
+        let dictionary = [
+            "ChecklistIndex": -1,
+            "FirstTime": true
+        ] as [String : Any]
         UserDefaults.standard.register(defaults: dictionary)
     }
     
@@ -69,16 +75,24 @@ class DataModel {
     }
     
     func handleFirstTime() {
+        print("handling first time")
         let userDefaults = UserDefaults.standard
         let firstTime = userDefaults.bool(forKey: "FirstTime")
-
+        print(firstTime)
         if firstTime {
+            print("my first time")
             let checklist = Checklist("List")
             lists.append(checklist)
-
+            
             indexOfSelectedChecklist = 0
             userDefaults.set(false, forKey: "FirstTime")
         }
     }
+    
+    func sortChecklists() {
+        lists.sort { list1, list2 in return list1.name.localizedStandardCompare(list2.name) == .orderedAscending
+        }
+    }
+    
 }
 

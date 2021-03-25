@@ -24,24 +24,36 @@ class AllListViewController: UITableViewController, ListDetailViewControllerDele
     
     func listDetailViewController(_ controller: ListDetailViewController, didFinishAdding checklist: Checklist) {
         
-        let newRowIndex = dataModel.lists.count
+//        let newRowIndex = dataModel.lists.count
+//        dataModel.lists.append(checklist)
+//
+//        let indexPath = IndexPath(row: newRowIndex, section: 0)
+//        let indexPaths = [indexPath]
+//        tableView.insertRows(at: indexPaths, with: .automatic)
+//
+//        navigationController?.popViewController(animated: true)
         dataModel.lists.append(checklist)
-
-        let indexPath = IndexPath(row: newRowIndex, section: 0)
-        let indexPaths = [indexPath]
-        tableView.insertRows(at: indexPaths, with: .automatic)
-
+        dataModel.sortChecklists()
+        tableView.reloadData()
         navigationController?.popViewController(animated: true)
     }
     
     func listDetailViewController(_ controller: ListDetailViewController, didFinishEditing checklist: Checklist) {
-        if let index = dataModel.lists.firstIndex(of: checklist) {
-            let indexPath = IndexPath(row: index, section: 0)
-            if let cell = tableView.cellForRow(at: indexPath) {
-                cell.textLabel!.text = checklist.name
-            }
-        }
+//        if let index = dataModel.lists.firstIndex(of: checklist) {
+//            let indexPath = IndexPath(row: index, section: 0)
+//            if let cell = tableView.cellForRow(at: indexPath) {
+//                cell.textLabel!.text = checklist.name
+//            }
+//        }
+//        navigationController?.popViewController(animated: true)
+        dataModel.sortChecklists()
+        tableView.reloadData()
         navigationController?.popViewController(animated: true)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        tableView.reloadData()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -50,10 +62,14 @@ class AllListViewController: UITableViewController, ListDetailViewControllerDele
         //set delegate in viewdidappear after viewdidload which loaded the viewcontrollers so this delegate wont fire off the willshow method overwriting  the userdefault
         navigationController?.delegate = self
             
+        //dont want to register default cell.
+//        tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
+        
         //if the user last segued to the checklist vc, wouldve set this user default. so we set index. if it hasnt it would be -1. if it was, we want to segue to where the user left off
 //        let index = UserDefaults.standard.integer(forKey: "ChecklistIndex")
         let index = dataModel.indexOfSelectedChecklist
         if index >= 0 && index < dataModel.lists.count {
+            print("Transitioning to where i left off")
             let checklist = dataModel.lists[index]
             performSegue(withIdentifier: "ShowChecklist", sender: checklist)
         }
@@ -67,7 +83,7 @@ class AllListViewController: UITableViewController, ListDetailViewControllerDele
         super.viewDidLoad()
         
         //registers the cell identifier with the underlying table view.
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
+//        tableView.register(UITableViewCell.self, forCellReuseIdentifier: cellIdentifier)
         
         //set title large
         navigationController?.navigationBar.prefersLargeTitles = true
@@ -91,19 +107,36 @@ class AllListViewController: UITableViewController, ListDetailViewControllerDele
     }
     //right now list contains statically created checklists
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        //dont want to dequeue default cell
 //        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
         
         let cell: UITableViewCell!
+        //dequeues reusable cell. if nil
         if let tmp = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
-              cell = tmp
+            cell = tmp
+            print("Failure")
         }
+        //create a new cell of a different style
         else {
             cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
         }
             
+        //set the properties of this new cell
         let checklist = dataModel.lists[indexPath.row]
         cell.textLabel!.text = checklist.name
         cell.accessoryType = .detailDisclosureButton
+        
+        //set the subtexts
+        let count = checklist.countUncheckedItems()
+        if checklist.items.count == 0 {
+            cell.detailTextLabel!.text = "(No Items)"
+        }
+        else {
+            cell.detailTextLabel!.text = count == 0 ? "All Done" : "\(count) Remaining"
+        }
+        
+        //set imageview
+        cell.imageView!.image = UIImage(named: checklist.iconName)
         
         return cell
     }
