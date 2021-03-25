@@ -7,7 +7,16 @@
 
 import UIKit
 
-class AllListViewController: UITableViewController, ListDetailViewControllerDelegate {
+class AllListViewController: UITableViewController, ListDetailViewControllerDelegate, UINavigationControllerDelegate {
+    
+    // MARK: - Navigation Controller Delegates
+    func navigationController(_ navigationController: UINavigationController, willShow viewController: UIViewController,animated: Bool) {
+        // Was the back button tapped?
+        if viewController === self {
+//            UserDefaults.standard.set(-1, forKey: "ChecklistIndex")
+            dataModel.indexOfSelectedChecklist = -1   // change this
+        }
+    }
     
     func listDetailViewControllerDidCancel(_ controller: ListDetailViewController) {
         navigationController?.popViewController(animated: true)
@@ -35,6 +44,20 @@ class AllListViewController: UITableViewController, ListDetailViewControllerDele
         navigationController?.popViewController(animated: true)
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        //set delegate in viewdidappear after viewdidload which loaded the viewcontrollers so this delegate wont fire off the willshow method overwriting  the userdefault
+        navigationController?.delegate = self
+            
+        //if the user last segued to the checklist vc, wouldve set this user default. so we set index. if it hasnt it would be -1. if it was, we want to segue to where the user left off
+//        let index = UserDefaults.standard.integer(forKey: "ChecklistIndex")
+        let index = dataModel.indexOfSelectedChecklist
+        if index >= 0 && index < dataModel.lists.count {
+            let checklist = dataModel.lists[index]
+            performSegue(withIdentifier: "ShowChecklist", sender: checklist)
+        }
+    }
 
     let cellIdentifier = "ChecklistCell"
     //var dataModel.lists = [Checklist]()
@@ -49,66 +72,16 @@ class AllListViewController: UITableViewController, ListDetailViewControllerDele
         //set title large
         navigationController?.navigationBar.prefersLargeTitles = true
         
-//        // 1
-//        var list = Checklist("Birthdays")
-//        dataModel.lists.append(list)
-//
-//        // 2
-//        list = Checklist("Groceries")
-//        dataModel.lists.append(list)
-//
-//        list = Checklist("Cool Apps")
-//        dataModel.lists.append(list)
-//
-//        list = Checklist("To do")
-//        dataModel.lists.append(list)
-        
+
         //adding fake data to the checklist item array
-        for list in dataModel.lists {
-            let item = ChecklistItem()
-            item.text = "Item for \(list.name)"
-            list.items.append(item)
-        }
+//        for list in dataModel.lists {
+//            let item = ChecklistItem()
+//            item.text = "Item for \(list.name)"
+//            list.items.append(item)
+//        }
     }
     
     
-//    // MARK: - Data Saving
-//    func documentsDirectory() -> URL {
-//        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-//        return paths[0]
-//    }
-//
-//    func dataFilePath() -> URL {
-//        return documentsDirectory().appendingPathComponent("Checklists.plist")
-//    }
-//
-//    // this method is now called saveChecklists()
-//    func saveChecklists() {
-//        let encoder = PropertyListEncoder()
-//        do {
-//            // You encode dataModel.lists instead of "items"
-//            let data = try encoder.encode(dataModel.lists)
-//            try data.write(to: dataFilePath(), options: Data.WritingOptions.atomic)
-//        }
-//        catch {
-//            print("Error encoding list array: \(error.localizedDescription)")
-//        }
-//    }
-//
-//    // this method is now called loadChecklists()
-//    func loadChecklists() {
-//        let path = dataFilePath()
-//        if let data = try? Data(contentsOf: path) {
-//            let decoder = PropertyListDecoder()
-//            do {
-//                // You decode to an object of [Checklist] type to dataModel.lists
-//                dataModel.lists = try decoder.decode([Checklist].self, from: data)
-//            }
-//            catch {
-//                print("Error decoding list array: \(error.localizedDescription)")
-//            }
-//        }
-//    }
 
     // MARK: - Table view data source
 
@@ -118,7 +91,15 @@ class AllListViewController: UITableViewController, ListDetailViewControllerDele
     }
     //right now list contains statically created checklists
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
+//        let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath)
+        
+        let cell: UITableViewCell!
+        if let tmp = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) {
+              cell = tmp
+        }
+        else {
+            cell = UITableViewCell(style: .subtitle, reuseIdentifier: cellIdentifier)
+        }
             
         let checklist = dataModel.lists[indexPath.row]
         cell.textLabel!.text = checklist.name
@@ -129,6 +110,10 @@ class AllListViewController: UITableViewController, ListDetailViewControllerDele
     //used this method to performsegue when user selects a checklist cell
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let checklist = dataModel.lists[indexPath.row]
+        
+//        UserDefaults.standard.set(indexPath.row, forKey: "ChecklistIndex")
+        dataModel.indexOfSelectedChecklist = indexPath.row
+        
         performSegue(withIdentifier: "ShowChecklist", sender: checklist)
     }
     

@@ -11,7 +11,9 @@ class DataModel {
     var lists = [Checklist]()
     
     init() {
-      loadChecklists()
+        loadChecklists()
+        registerDefaults()
+        handleFirstTime()
     }
     
     // MARK: - Data Saving
@@ -52,4 +54,31 @@ class DataModel {
         }
     }
     
+    func registerDefaults() {
+        let dictionary = [ "ChecklistIndex": -1 ]
+        UserDefaults.standard.register(defaults: dictionary)
+    }
+    
+    var indexOfSelectedChecklist: Int {
+        get {
+            return UserDefaults.standard.integer(forKey: "ChecklistIndex")
+        }
+        set {
+            UserDefaults.standard.set(newValue,forKey: "ChecklistIndex")
+        }
+    }
+    
+    func handleFirstTime() {
+        let userDefaults = UserDefaults.standard
+        let firstTime = userDefaults.bool(forKey: "FirstTime")
+
+        if firstTime {
+            let checklist = Checklist("List")
+            lists.append(checklist)
+
+            indexOfSelectedChecklist = 0
+            userDefaults.set(false, forKey: "FirstTime")
+        }
+    }
 }
+

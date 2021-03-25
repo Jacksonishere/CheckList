@@ -15,7 +15,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         
+        //we want to set the allListVCs datamodel.
         let navigationController = window!.rootViewController as! UINavigationController
+        //once we get the root controller, we want to go to the correct vc which is the one at index 0 of list of vcs embedded in nav controller
         let controller = navigationController.viewControllers[0] as! AllListViewController
         controller.dataModel = dataModel
     }
