@@ -25,7 +25,6 @@ class DataModel {
     func dataFilePath() -> URL {
         return documentsDirectory().appendingPathComponent("Checklists.plist")
     }
-
     // this method is now called saveChecklists()
     func saveChecklists() {
         let encoder = PropertyListEncoder()
@@ -81,7 +80,7 @@ class DataModel {
         print(firstTime)
         if firstTime {
             print("my first time")
-            let checklist = Checklist("List")
+            let checklist = Checklist(name: "List")
             lists.append(checklist)
             
             indexOfSelectedChecklist = 0
@@ -94,5 +93,11 @@ class DataModel {
         }
     }
     
+    class func nextChecklistItemID() -> Int {
+        let userDefaults = UserDefaults.standard
+        let itemID = userDefaults.integer(forKey: "ChecklistItemID")
+        userDefaults.set(itemID + 1, forKey: "ChecklistItemID")
+        return itemID
+    }
 }
 
